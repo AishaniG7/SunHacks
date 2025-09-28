@@ -1,39 +1,44 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
+
 const AIG = new GoogleGenAI({});
+const fs = require('fs');
+
+let syllabus = "";
+fs.readFile("./app/syllabus.txt","utf8", (err: any, data: any) => {
+  if (err == null) {
+    syllabus = data;
+  }
+  else {
+    console.log(err)
+  }
+});
+
+if (syllabus == undefined) {
+  console.log("SYLLABUS IS UNDEFINED :<");
+}
 
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
-  const { topic, essay } = await req.json();
+  const { chosenTopic, essay } = await req.json();
+
+  const topic = chosenTopic;
+
+  console.log("TOPIC: ", topic);
+  
 
   try {
-    /*
-    const response = await fetch("https://api.google.com/gemini/v1/models/generate", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gemini-2.5-flash",
-        prompt: `Grade this essay on the topic "${topic}": ${essay}`
-      }),
-    });
 
-    if (!response.ok) throw new Error("Failed to grade essay");
-    */
-
-    let query = "Given this topic " + topic + " grade the following essay:\n" + essay;
+    let query = "Given this topic " + topic + " grade the following essay based on this syllabus:\n" + syllabus + "Give the grade in A-F first in the format: Grade: A-F, followed by the feedback. Also, repeat the prompt" +  "\n(ESSAY START)\n" + essay;
 
     const response = await AIG.models.generateContent({
       model: "gemini-2.5-flash",
       contents: query,
     });
-
-    //const data = await response.json();
+    
     return NextResponse.json({ feedback: response.text });
   } 
   catch (error) {
