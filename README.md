@@ -1,10 +1,10 @@
-### ✏️ *AI Writing Tutor* 
+# ✏️ *AI Writing Tutor* 
  
 An application designed to help review essays and improve writing skills. 📝
 
 ## Getting Started
 
-# Prerequisites 
+### Prerequisites 
  * Node.js and npm
  * Gemini API Key (https://aistudio.google.com/app/api-keys)
    
