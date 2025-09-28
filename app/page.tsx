@@ -2,11 +2,14 @@
 
 import React, { useState } from "react";
 
+import { useState } from "react";
+import  ReactMarkdown from "react-markdown";
 
 export default function Home() {
   const [topic, setTopic] = useState("");
   const [essay, setEssay] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [customTopic, setCustomTopic] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isGrading, setIsGrading] = useState(false);
 
@@ -22,9 +25,11 @@ export default function Home() {
     try{
       const res = await fetch("/api/generateTopic");
       const data = await res.json();
+    console.log(typeof(data.topic));
       setTopic(data.topic);
       setEssay("");
       setFeedback("");
+    //setCustomTopic("");
     } catch(error) {
       console.error("Error generating topic:", error);
     } finally {
@@ -33,13 +38,18 @@ export default function Home() {
   };
 
   const gradeEssay = async () => {
+
+    const chosenTopic = customTopic !== "" ? customTopic : topic;
+    console.log("CHOSEN TOPIC: ", chosenTopic )
+
     setIsGrading(true);
     try{
     const res = await fetch("/api/gradeEssay", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, essay }),
+      body: JSON.stringify({ chosenTopic, essay }),
     });
+    console.log(res);
     const data = await res.json();
     setFeedback(data.feedback);
     } catch(error) {
@@ -57,6 +67,16 @@ export default function Home() {
         <div className="animate-spin [animation-duration: s] rounded-full h-5 w-5 border-b-2 border-white"></div>
       ) : ('Generate Topic')}
       </button>
+    <div style={{ padding: "2rem", maxWidth: "800px", margin: "auto" }}>
+      <h1>AI Writing Tutor</h1>
+      <textarea
+        rows = {3}
+        cols={80}
+        placeholder="Enter your custom prompt here:"
+        value = {customTopic}
+        onChange={(e) => setCustomTopic(e.target.value)}
+      />
+      <button onClick={generateTopic}>Generate Topic</button>
 
       {topic && <h2 className="my-5"style={{ fontFamily: 'Helvetica', fontSize: '150%' }}>Topic: {topic}</h2>}
 
@@ -82,6 +102,7 @@ export default function Home() {
       )}
 
       {feedback && (
+
         <div
           style={{
             marginTop: "1rem",
@@ -93,7 +114,7 @@ export default function Home() {
           }} className="rounded-xl"
         >
           <h3>Feedback:</h3>
-          {feedback}
+          <ReactMarkdown>{feedback}</ReactMarkdown>
         </div>
       )}
     </div>
