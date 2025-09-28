@@ -81,8 +81,6 @@ export default function Home() {
 
       {topic && customTopic === "" && (<h2 className="my-5" style={{ fontFamily: 'Helvetica', fontSize: '150%' }}><span className={"font-bold "}>Topic: </span>{topic}</h2>)}
 
-      {topic && (
-        <>
           <textarea
             style={{ fontFamily: 'Helvetica' }}
             rows={10}
@@ -99,8 +97,6 @@ export default function Home() {
   ) : (
     'Submit Essay'
   )}</button>
-        </>
-      )}
 
       {feedback && (
 
